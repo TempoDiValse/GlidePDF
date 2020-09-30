@@ -16,8 +16,8 @@ class GlideModuler : AppGlideModule() {
      * 커스텀으로 개발한 모듈을 등록한다.
      */
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
-        registry
-            .prepend(Uri::class.java, ByteBuffer::class.java, PDFModelLoader.Factory(context)) // PDF 로더
+        registry.prepend(Uri::class.java, ByteBuffer::class.java, PDFModelLoader.Factory(context)) // PDF 로더
+        //registry.append(Uri::class.java, ByteBuffer::class.java, PDFModelLoader.Factory(context))
     }
 
     /**

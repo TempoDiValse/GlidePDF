@@ -52,8 +52,7 @@ class PDFModelLoader private constructor (private val context: Context) : ModelL
      * GlideModule 에 등록할 때에는 Factory 클래스를 통해서 등록하도록 되어있다.
      */
     class Factory(private val context:Context) : ModelLoaderFactory<Uri, ByteBuffer> {
-        override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Uri, ByteBuffer>
-            = PDFModelLoader(context)
+        override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Uri, ByteBuffer> = PDFModelLoader(context)
 
         // 빈칸으로 냅두라고 함.
         override fun teardown() {}

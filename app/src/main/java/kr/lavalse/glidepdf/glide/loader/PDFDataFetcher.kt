@@ -3,20 +3,17 @@ package kr.lavalse.glidepdf.glide.loader
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.ParcelFileDescriptor
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.data.DataFetcher
 import com.shockwave.pdfium.PdfiumCore
 import java.io.ByteArrayOutputStream
-import java.lang.Exception
-import java.lang.NullPointerException
 import java.nio.ByteBuffer
-import kotlin.math.max
 
 class PDFDataFetcher(private val context: Context, uri: Uri) : DataFetcher<ByteBuffer> {
     private val resolver = context.contentResolver
-    private var fd : ParcelFileDescriptor? = resolver.openFileDescriptor(uri, "r")
+
+    private var fd = resolver.openFileDescriptor(uri, "r")
 
     private var page : Int = 0
 
@@ -52,11 +49,8 @@ class PDFDataFetcher(private val context: Context, uri: Uri) : DataFetcher<ByteB
                 // Config.RGB_565 를 선택하면 메모리가 그나마 적게 든다 ARGB_8888 이랑 비교해도 별 차이 안 느껴질 정도
                 val out = Bitmap.createBitmap(_width, _height, Bitmap.Config.RGB_565)
 
-                // Bitmap 에 Render 하게 될 위치를 지정한다. 위치는 가운데로 올 수 있도록 한다.
-                val startX = max(0, (out.width / 2) - (_width / 2))
-                val startY = max(0, (out.height / 2) - (_height / 2))
-
-                renderPageBitmap(document, out, page, startX, startY, out.width, out.height)
+                renderPageBitmap(document, out, page, 0, 0, out.width, out.height)
+                closeDocument(document)
 
                 // ByteBuffer 를 만들기 위해서는 Compress 를 통해서 ByteArrayOutputStream 에 접근해야 한다.
                 // 그 다음 ByteArrayOutputStream 에서 toByteArray 를 통해 꺼내 올 수 있다.
@@ -72,6 +66,9 @@ class PDFDataFetcher(private val context: Context, uri: Uri) : DataFetcher<ByteB
 
             // ByteBuffer 가 만들어지면 호출
             callback.onDataReady(buffer)
+
+            // 전송한 버퍼는 클리
+            buffer.clear()
         } catch (e : Exception) {
             callback.onLoadFailed(e)
         }
@@ -81,6 +78,7 @@ class PDFDataFetcher(private val context: Context, uri: Uri) : DataFetcher<ByteB
      * InputStream 처럼 I/O 객체일 때 여기에서 close 하도록 한다. InputStream 을 읽어들일 때나 사용.
      */
     override fun cleanup() {
+        // 열어놓은 파일을 닫아 놓는다.
         fd?.close()
 
         fd = null
